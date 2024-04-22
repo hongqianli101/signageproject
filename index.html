@@ -7,10 +7,58 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div><h2>CITY OF SIGNS</h2></div>
+<div class="menu">
+    <div id="leftmenu">
+    <h1>CITY OF SIGNS</h1>
+    <select id="languageDropdown">
+        <option value="All">All Languages</option>
+        <option value="English">English</option>
+        <option value="Non-English">Non-English</option>
+        <option value="Spanish">Spanish</option>
+        <option value="Chinese">Chinese</option>
+        <option value="Italian">Italian</option>
+        <option value="French">French</option>
+        <option value="Korean">Korean</option>
+        <option value="Russian">Russian</option>
+        <option value="Bengali">Bengali</option>
+        <option value="Haitian Creole">Haitian Creole</option>
+    </select>
+    <select id="categoryDropdown">
+        <option value="All Categories">All Categories</option>
+        <option value="Brand Sign">Brand Sign</option>
+        <option value="Street Name Sign">Street Name Sign</option>
+        <option value="Building Information Sign">Building Information Sign</option>
+        <option value="Bus Stop Sign">Bus Stop Sign</option>
+        <option value="Parking Regulation Sign">Parking Regulation Sign</option>
+        <option value="Scaffold Sign">Scaffold Sign</option>
+        <option value="One Way Sign">One Way Sign</option>
+        <option value="Advertising Sign">Advertising Sign</option>
+        <option value="For Lease Sign">For Lease Sign</option>
+        <option value="Do Not Enter Sign">Do Not Enter Sign</option>
+        <option value="Speed Limit Sign">Speed Limit Sign</option>
+        <option value="Promotion Sign">Promotion Sign</option>
+        <option value="Direction Sign">Direction Sign</option>
+        <option value="Subway Sign">Subway Sign</option>
+        <option value="Touristic Sign">Touristic Sign</option>
+        <option value="Shop Information Sign">Shop Information Sign</option>
+        <option value="Street Close Sign">Street Close Sign</option>
+        <option value="School Crossing Sign">School Crossing Sign</option>
+        <option value="All Traffic Sign">All Traffic Sign</option>
+        <option value="Don't Block Sign">Don't Block Sign</option>
+    </select>
+    <input type="text" id="searchBar" placeholder="Search text..."><button id="searchButton">Search</button>
+    </div>
+    <div id="rightmenu">
+    <a href="sign_category.html">Sign Category</a>
+    <span>—</span>
+    <a href="sign_language.html">Sign Language</a>
+    <span>—</span>
+    <a href="sign_content.html">Sign Content</a>
+    </div>
+</div>
     <div id="barcontainer"></div>
     <script type="text/javascript">
-
+    let currentScale = 0.05;
     let baseWidth = 10; 
     let baseGap = 4; 
     let width = baseWidth; 
@@ -18,7 +66,7 @@
     let selectedId = null;
     let data = []; 
 
-    d3.json("data.json").then(function(loadedData) {
+    d3.json("data_fina.json").then(function(loadedData) {
         data = loadedData;
         const expandedWidth = width * 24; 
         const bars = d3.select("#barcontainer").selectAll(".bar")
@@ -50,7 +98,6 @@
                 secondTextContainer.append("p").text(d.w_text);
                 selection.append("img").attr("src", d.w_image_s);
                 });
-
 
 
 
@@ -100,15 +147,116 @@
                     selectBar(data[index - 1].id);
                 }
             });
+    updateBarsPositionAndSize(); 
+});
+
+
+document.addEventListener('DOMContentLoaded', (event) => {
+    const searchBar = document.getElementById("searchBar");
+    const searchButton = document.getElementById("searchButton");
+
+    // 加载数据并初始化视图
+    d3.json("data_final.json").then(function(loadedData) {
+        const bars = d3.select("#barcontainer").selectAll(".bar")
+            .data(loadedData)
+            .enter().append("div")
+            .attr("class", "bar show") // 默认所有元素都是显示的
+            // ...添加其他元素属性和样式，如文本、图片等...
+    });
+
+    // 封装搜索逻辑成一个函数
+    function performSearch() {
+        const searchText = searchBar.value.toLowerCase();
+
+        d3.select("#barcontainer").selectAll(".bar")
+            .classed("show", function(d) {
+                const matchText = d.e_text.toLowerCase().includes(searchText) || d.w_text.toLowerCase().includes(searchText);
+                return matchText;
+            })
+            .classed("hide", function(d) {
+                const matchText = d.e_text.toLowerCase().includes(searchText) || d.w_text.toLowerCase().includes(searchText);
+                return !matchText;
+            });
+    }
+
+    // 绑定点击事件到搜索按钮
+    searchButton.addEventListener("click", performSearch);
+});
+
+
+
+document.addEventListener('DOMContentLoaded', (event) => {
+    const languageDropdown = document.getElementById("languageDropdown");
+
+    function filterByLanguage() {
+    const selectedLanguage = languageDropdown.value;
+
+    d3.select("#barcontainer").selectAll(".bar")
+        .classed("show", function(d) {
+            // 确保 language_full 有值
+            const hasLanguage = d.language_full && d.language_full.trim().length > 0;
+            
+            if (selectedLanguage === "All") {
+                // 如果选中"All Languages"，显示所有元素
+                return true;
+            } else if (selectedLanguage === "Non-English") {
+                // 如果选中"Non-English"，则显示有值且不包含"English"的元素
+                // 同时检查 language_full 是否有值
+                return hasLanguage && !d.language_full.toLowerCase().includes("english");
+            } else {
+                // 对于其他具体的语言选项，检查"language_full"字段是否有值且包含选中的语言
+                return hasLanguage && d.language_full.toLowerCase().includes(selectedLanguage.toLowerCase());
+            }
+        })
+        .classed("hide", function(d) {
+            const hasLanguage = d.language_full && d.language_full.trim().length > 0;
+            
+            if (selectedLanguage === "All") {
+                return false;
+            } else if (selectedLanguage === "Non-English") {
+                // 如果没有值或包含"English"，则隐藏
+                return !hasLanguage || d.language_full.toLowerCase().includes("english");
+            } else {
+                return !hasLanguage || !d.language_full.toLowerCase().includes(selectedLanguage.toLowerCase());
+            }
+        });
+}
+
+
+
+    languageDropdown.addEventListener("change", filterByLanguage);
 });
 
 
 
 
+document.addEventListener('DOMContentLoaded', (event) => {
+    const categoryDropdown = document.getElementById("categoryDropdown");
+
+
+    // 封装筛选逻辑成一个函数
+    function filterByCategory() {
+        const selectedCategory = categoryDropdown.value.toLowerCase(); 
+
+        d3.select("#barcontainer").selectAll(".bar")
+            .classed("show", function(d) {
+                if (selectedCategory === "all categories") return true; // 如果选中“All Categories”，显示所有元素
+                // 使用 includes() 检查 category 字段是否包含选中的分类
+                return d.category.includes(selectedCategory);
+            })
+            .classed("hide", function(d) {
+                if (selectedCategory === "all categories") return false;
+                return !d.category.includes(selectedCategory);
+            });
+    }
+
+    // 绑定变化事件到分类下拉菜单
+    categoryDropdown.addEventListener("change", filterByCategory);
+});
+
 
 
 ///////////////// 在窗口上监听鼠标滚轮事件
-let currentScale = 1;
 window.addEventListener('wheel', function(event) {
     if(event.deltaY < 0) {
         currentScale *= 1.1; // 向上滚动，放大
@@ -146,6 +294,9 @@ function updateBarsPositionAndSize() {
 
     updateCommunityOverlays(); // 更新社区方块的位置和宽度
 }
+///////////////// 在窗口上监听鼠标滚轮事件
+
+
 
 
 
