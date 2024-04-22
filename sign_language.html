@@ -5,10 +5,16 @@
     <title>Sign Language</title>
     <script src="https://d3js.org/d3.v6.min.js"></script>
     <style>
+        *{
+            margin-top: 1px;
+        }
         body {
             background-color: black;
             color: white;
             font-family: Arial, Helvetica, sans-serif;
+        }
+        body::-webkit-scrollbar {
+            display: none; /* 对Chrome和Safari有效 */
         }
         .checkboxes label {
             margin-right: 10px;
@@ -31,11 +37,41 @@
             text-decoration: none;
             color: white;
         }
+        .menu {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            align-items:center;
+        }
+        #rightmenu {
+            margin-right: 3px;
+        }
+        #rightmenu a {
+            text-decoration: none;
+            color: white;
+            font-size: 18px;
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 10px;
+        }
+        span {
+            color: white;
+        }
     </style>
 </head>
 <body>
     <div>
-        <h1><a href="index.html">CITY OF SIGNS</a></h1>
+        <div class="menu">
+            <div id="leftmenu">
+            <h1><a href="index.html">CITY OF SIGNS</a></h1>
+            </div>
+            <div id="rightmenu">
+                <a href="sign_category.html">Sign Category</a>
+                <span>‧</span>
+                <a href="sign_language.html">Sign Language</a>
+                <span>‧</span>
+                <a href="sign_content.html">Sign Content</a>
+            </div>
+            </div>
         <div id="checkboxes" class="checkboxes"></div>
     </div>
 <script>
