@@ -66,7 +66,7 @@
     let selectedId = null;
     let data = []; 
 
-    d3.json("data_fina.json").then(function(loadedData) {
+    d3.json("data_final.json").then(function(loadedData) {
         data = loadedData;
         const expandedWidth = width * 24; 
         const bars = d3.select("#barcontainer").selectAll(".bar")
