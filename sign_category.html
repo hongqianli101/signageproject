@@ -59,6 +59,13 @@
         span {
             color: white;
         }
+        .label-container {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 5px; 
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -114,16 +121,29 @@ console.log(Array.from(communityNames));
     // 生成复选框
     const languages = Object.keys(languageColors);
     const checkboxesDiv = d3.select("#checkboxes");
-    languages.forEach(language => {
-        const label = checkboxesDiv.append("label");
-        label.append("input")
-            .attr("type", "checkbox")
-            .attr("value", language)
-            .attr("checked", true)
-            .on("change", () => drawCharts(expandedData, languageColors));
-        label.append("span")
-            .text(language);
-    });
+        languages.forEach(language => {
+            const label = checkboxesDiv.append("div")  // 使用 div 代替 label，因为我们要自定义布局
+                .attr("class", "label-container");  // 应用刚才定义的 CSS 类
+
+            const imagePath = `images/${language.toLowerCase()}.png`;
+
+            label.append("img")
+                .attr("src", imagePath)
+                .attr("alt", `${language} logo`)
+                .style("height", "30px")
+                .style("display", "block");
+
+            const inputContainer = label.append("div");  // 为复选框和文字创建一个新的 div 容器
+
+            inputContainer.append("input")
+                .attr("type", "checkbox")
+                .attr("value", language)
+                .attr("checked", true)
+                .on("change", () => drawCharts(expandedData, languageColors));
+
+            inputContainer.append("span")
+                .text(language);
+        });
 
     drawCharts(expandedData, languageColors);
 });

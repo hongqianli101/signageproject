@@ -221,12 +221,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
             }
         });
 }
-
-
-
     languageDropdown.addEventListener("change", filterByLanguage);
 });
-
 
 
 
@@ -280,23 +276,9 @@ function updateBarsPositionAndSize() {
         .style("left", function(d, i) {
             return `${i * (newWidth + newGap)}px`;
         });
-}
-
-function updateBarsPositionAndSize() {
-    const newWidth = baseWidth * currentScale; // 计算新宽度
-    const newGap = baseGap * currentScale; // 计算新间隙
-
-    d3.select("#barcontainer").selectAll(".bar")
-        .style("width", newWidth + "px")
-        .style("left", function(d, i) {
-            return `${i * (newWidth + newGap)}px`;
-        });
-
     updateCommunityOverlays(); // 更新社区方块的位置和宽度
 }
 ///////////////// 在窗口上监听鼠标滚轮事件
-
-
 
 
 

@@ -56,6 +56,14 @@
         span {
             color: white;
         }
+        .label-container {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px; 
+            font-size: 14px;
+        }
+
     </style>
 </head>
 <body>
@@ -85,8 +93,6 @@ const languageColors = {
     'French': '#009688',
     'Korean': '#cddc39',
     'Russian': '#ffc107',
-    'Bengali': '#ff9800',
-    'Haitian Creole': '#ff5722'
 };
 
 d3.csv(csvFilePath).then(function(data) {
@@ -97,22 +103,33 @@ d3.csv(csvFilePath).then(function(data) {
         // 使用Set来收集唯一的社区名称
         let communityNames = new Set(expandedData.map(d => d.NTAName));
 
-// 将所有社区名称转换为数组并打印
-console.log(Array.from(communityNames));
+        // 生成复选框
+        const languages = Object.keys(languageColors);
+        const checkboxesDiv = d3.select("#checkboxes");
+        languages.forEach(language => {
+            const label = checkboxesDiv.append("div")  // 使用 div 代替 label，因为我们要自定义布局
+                .attr("class", "label-container");  // 应用刚才定义的 CSS 类
 
-    // 生成复选框
-    const languages = Object.keys(languageColors);
-    const checkboxesDiv = d3.select("#checkboxes");
-    languages.forEach(language => {
-        const label = checkboxesDiv.append("label");
-        label.append("input")
-            .attr("type", "checkbox")
-            .attr("value", language)
-            .attr("checked", true)
-            .on("change", () => drawCharts(expandedData, languageColors));
-        label.append("span")
-            .text(language);
-    });
+            const imagePath = `images/${language.toLowerCase()}.png`;
+
+            label.append("img")
+                .attr("src", imagePath)
+                .attr("alt", `${language} logo`)
+                .style("height", "30px")
+                .style("display", "block");
+
+            const inputContainer = label.append("div");  // 为复选框和文字创建一个新的 div 容器
+
+            inputContainer.append("input")
+                .attr("type", "checkbox")
+                .attr("value", language)
+                .attr("checked", true)
+                .on("change", () => drawCharts(expandedData, languageColors));
+
+            inputContainer.append("span")
+                .text(language);
+        });
+
 
     drawCharts(expandedData, languageColors);
 });

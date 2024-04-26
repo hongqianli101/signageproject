@@ -6,7 +6,7 @@
 body {
     background-color: #000000;
     color: white;
-    overflow: auto; /* Prevents scrollbars */
+    overflow: auto; 
     overflow-y: hidden;
 }
 
@@ -65,7 +65,7 @@ h1 {
 }
 
 #rightmenu span {
-    display: inline-block; /* 让宽度设置生效 */
+    display: inline-block; 
     width: 5.18px;
 }
 
@@ -118,7 +118,6 @@ h1 {
     transform-origin: left top;
     position: absolute;
     top:42px;
-
     width: 100%;
 }
 
