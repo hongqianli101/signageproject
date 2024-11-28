@@ -49,6 +49,8 @@
     <input type="text" id="searchBar" placeholder="Search text..."><button id="searchButton">Search</button>
     </div>
     <div id="rightmenu">
+    <a href="https://gsapp-cdp.github.io/archive/projects/2024/the-sign-of-the-city/">About</a>
+    <span>‧</span>
     <a href="sign_category.html">Sign Category</a>
     <span>‧</span>
     <a href="sign_language.html">Sign Language</a>
@@ -58,7 +60,7 @@
 </div>
     <div id="barcontainer"></div>
     <script type="text/javascript">
-    let currentScale = 0.05;
+    let currentScale = 0.6;
     let baseWidth = 10; 
     let baseGap = 4; 
     let width = baseWidth; 
@@ -261,7 +263,7 @@ window.addEventListener('wheel', function(event) {
     }
 
     // 限制缩放级别
-    currentScale = Math.max(Math.min(currentScale, 1), 0.05);
+    currentScale = Math.max(Math.min(currentScale, 1), 0.6);
 
     // 更新 bars 的宽度和间隙
     updateBarsPositionAndSize();
