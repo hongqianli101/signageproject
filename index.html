@@ -1,354 +1,241 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>CITY OF SIGNS</title>
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-<div class="menu">
-    <div id="leftmenu">
-    <h1>CITY OF SIGNS</h1>
-    <select id="languageDropdown">
-        <option value="All">All Languages</option>
-        <option value="English">English</option>
-        <option value="Non-English">Non-English</option>
-        <option value="Spanish">Spanish</option>
-        <option value="Chinese">Chinese</option>
-        <option value="Italian">Italian</option>
-        <option value="French">French</option>
-        <option value="Korean">Korean</option>
-        <option value="Russian">Russian</option>
-        <option value="Bengali">Bengali</option>
-        <option value="Haitian Creole">Haitian Creole</option>
-    </select>
-    <select id="categoryDropdown">
-        <option value="All Categories">All Categories</option>
-        <option value="Brand Sign">Brand Sign</option>
-        <option value="Street Name Sign">Street Name Sign</option>
-        <option value="Building Information Sign">Building Information Sign</option>
-        <option value="Bus Stop Sign">Bus Stop Sign</option>
-        <option value="Parking Regulation Sign">Parking Regulation Sign</option>
-        <option value="Scaffold Sign">Scaffold Sign</option>
-        <option value="One Way Sign">One Way Sign</option>
-        <option value="Advertising Sign">Advertising Sign</option>
-        <option value="For Lease Sign">For Lease Sign</option>
-        <option value="Do Not Enter Sign">Do Not Enter Sign</option>
-        <option value="Speed Limit Sign">Speed Limit Sign</option>
-        <option value="Promotion Sign">Promotion Sign</option>
-        <option value="Direction Sign">Direction Sign</option>
-        <option value="Subway Sign">Subway Sign</option>
-        <option value="Touristic Sign">Touristic Sign</option>
-        <option value="Shop Information Sign">Shop Information Sign</option>
-        <option value="Street Close Sign">Street Close Sign</option>
-        <option value="School Crossing Sign">School Crossing Sign</option>
-        <option value="All Traffic Sign">All Traffic Sign</option>
-        <option value="Don't Block Sign">Don't Block Sign</option>
-    </select>
-    <input type="text" id="searchBar" placeholder="Search text..."><button id="searchButton">Search</button>
-    </div>
-    <div id="rightmenu">
-    <a href="https://gsapp-cdp.github.io/archive/projects/2024/the-sign-of-the-city/">About</a>
-    <span>‧</span>
-    <a href="sign_category.html">Sign Category</a>
-    <span>‧</span>
-    <a href="sign_language.html">Sign Language</a>
-    <span>‧</span>
-    <a href="sign_content.html">Sign Content</a>
-    </div>
-</div>
-    <div id="barcontainer"></div>
-    <script type="text/javascript">
-    let currentScale = 0.6;
-    let baseWidth = 10; 
-    let baseGap = 4; 
-    let width = baseWidth; 
-    let gap = baseGap;
-    let selectedId = null;
-    let data = []; 
-
-    d3.json("data_final.json").then(function(loadedData) {
-        data = loadedData;
-        const expandedWidth = width * 24; 
-        const bars = d3.select("#barcontainer").selectAll(".bar")
-        .data(data)
-        .enter().append("div")
-        .attr("class", "bar")
-        .attr("data-id", d => d.id) 
-        .style("left", (d, i) => `${i * (width + gap)}px`)
-        .style("top", "24px")
-        .style("height", "1000px");
-            bars.each(function(d) {
-            const selection = d3.select(this);
-                selection.append("img").attr("src", d.e_image_s);
-                const firstTextContainer = selection.append("div").attr("class", "text-container");
-                firstTextContainer.append("p").text(d.e_text);
-                selection.append("div").attr("class", "titletext").append("p").text('Category');  
-                selection.append("img").attr("src", d.e_image_c);
-                selection.append("div").attr("class", "titletext").append("p").text('Language');  
-                selection.append("img").attr("src", d.e_image_l);
-                selection.append("div").attr("class", "titletext").append("p").text('Meidan household income');  
-                selection.append("img").attr("src", d.image_h);
-                selection.append("div").attr("class", "titletext").append("p").text('Race');  
-                selection.append("img").attr("src", d.image_d);
-                selection.append("div").attr("class", "titletext").append("p").text('Language'); 
-                selection.append("img").attr("src", d.w_image_l);
-                selection.append("div").attr("class", "titletext").append("p").text('Category');  
-                selection.append("img").attr("src", d.w_image_c);
-                const secondTextContainer = selection.append("div").attr("class", "text-container");
-                secondTextContainer.append("p").text(d.w_text);
-                selection.append("img").attr("src", d.w_image_s);
-                });
-
-
-
-
-////// Function to update which bar is selected and expanded
-                let selectedId = data[0].id; 
-                function selectBar(newId) {
-                    selectedId = newId;
-    
-                bars.classed("expanded", false)
-                    .transition()
-                    .style("width", width + "px")
-                    .select("p").style("display", "none");
-    
-                bars.filter(d => d.id === selectedId)
-                    .classed("expanded", true)
-                    .transition()
-                    .style("width", expandedWidth + "px")
-                    .select("p").style("display", "block");
-    
-                // Adjust left position of each bar based on the new selection
-                bars.style("left", (d, i) => {
-                    const index = data.findIndex(bar => bar.id === selectedId);
-                    if (i < index) {
-                        return `${i * (width + gap)}px`;
-                    } else if (i === index) {
-                        return `${i * (width + gap)}px`;
-                    } else {
-                        return `${i * (width + gap) + (expandedWidth - width)}px`;
-                    }
-                });
-            
-            updateCommunityOverlays(); // 更新社区覆盖层的位置和宽度
-            }
-            // Initially select the first bar
-            selectBar(selectedId);
-            // Bar click event
-            bars.on("click", function(_, d) {
-                selectBar(d.id);
-            });
-            // Keyboard navigation
-            d3.select(window).on("keydown", function(event) {
-                const index = data.findIndex(bar => bar.id === selectedId);
-                if (event.key === "ArrowRight" && index < data.length - 1) {
-                    selectBar(data[index + 1].id);
-                } else if (event.key === "ArrowLeft" && index > 0) {
-                    selectBar(data[index - 1].id);
-                }
-            });
-    updateBarsPositionAndSize(); 
-});
-
-
-document.addEventListener('DOMContentLoaded', (event) => {
-    const searchBar = document.getElementById("searchBar");
-    const searchButton = document.getElementById("searchButton");
-
-    // 加载数据并初始化视图
-    d3.json("data_final.json").then(function(loadedData) {
-        const bars = d3.select("#barcontainer").selectAll(".bar")
-            .data(loadedData)
-            .enter().append("div")
-            .attr("class", "bar show") // 默认所有元素都是显示的
-            // ...添加其他元素属性和样式，如文本、图片等...
-    });
-
-    // 封装搜索逻辑成一个函数
-    function performSearch() {
-        const searchText = searchBar.value.toLowerCase();
-
-        d3.select("#barcontainer").selectAll(".bar")
-            .classed("show", function(d) {
-                const matchText = d.e_text.toLowerCase().includes(searchText) || d.w_text.toLowerCase().includes(searchText);
-                return matchText;
-            })
-            .classed("hide", function(d) {
-                const matchText = d.e_text.toLowerCase().includes(searchText) || d.w_text.toLowerCase().includes(searchText);
-                return !matchText;
-            });
-    }
-
-    // 绑定点击事件到搜索按钮
-    searchButton.addEventListener("click", performSearch);
-});
-
-
-
-document.addEventListener('DOMContentLoaded', (event) => {
-    const languageDropdown = document.getElementById("languageDropdown");
-
-    function filterByLanguage() {
-    const selectedLanguage = languageDropdown.value;
-
-    d3.select("#barcontainer").selectAll(".bar")
-        .classed("show", function(d) {
-            // 确保 language_full 有值
-            const hasLanguage = d.language_full && d.language_full.trim().length > 0;
-            
-            if (selectedLanguage === "All") {
-                // 如果选中"All Languages"，显示所有元素
-                return true;
-            } else if (selectedLanguage === "Non-English") {
-                // 如果选中"Non-English"，则显示有值且不包含"English"的元素
-                // 同时检查 language_full 是否有值
-                return hasLanguage && !d.language_full.toLowerCase().includes("english");
-            } else {
-                // 对于其他具体的语言选项，检查"language_full"字段是否有值且包含选中的语言
-                return hasLanguage && d.language_full.toLowerCase().includes(selectedLanguage.toLowerCase());
-            }
-        })
-        .classed("hide", function(d) {
-            const hasLanguage = d.language_full && d.language_full.trim().length > 0;
-            
-            if (selectedLanguage === "All") {
-                return false;
-            } else if (selectedLanguage === "Non-English") {
-                // 如果没有值或包含"English"，则隐藏
-                return !hasLanguage || d.language_full.toLowerCase().includes("english");
-            } else {
-                return !hasLanguage || !d.language_full.toLowerCase().includes(selectedLanguage.toLowerCase());
-            }
-        });
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Sign of the City</title>
+    <style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; /* Ensures consistent box model */
 }
-    languageDropdown.addEventListener("change", filterByLanguage);
-});
 
-
-
-document.addEventListener('DOMContentLoaded', (event) => {
-    const categoryDropdown = document.getElementById("categoryDropdown");
-
-
-    // 封装筛选逻辑成一个函数
-    function filterByCategory() {
-        const selectedCategory = categoryDropdown.value.toLowerCase(); 
-
-        d3.select("#barcontainer").selectAll(".bar")
-            .classed("show", function(d) {
-                if (selectedCategory === "all categories") return true; // 如果选中“All Categories”，显示所有元素
-                // 使用 includes() 检查 category 字段是否包含选中的分类
-                return d.category.includes(selectedCategory);
-            })
-            .classed("hide", function(d) {
-                if (selectedCategory === "all categories") return false;
-                return !d.category.includes(selectedCategory);
-            });
-    }
-
-    // 绑定变化事件到分类下拉菜单
-    categoryDropdown.addEventListener("change", filterByCategory);
-});
-
-
-
-///////////////// 在窗口上监听鼠标滚轮事件
-window.addEventListener('wheel', function(event) {
-    if(event.deltaY < 0) {
-        currentScale *= 1.1; // 向上滚动，放大
-    } else {
-        currentScale /= 1.1; // 向下滚动，缩小
-    }
-
-    // 限制缩放级别
-    currentScale = Math.max(Math.min(currentScale, 1), 0.6);
-
-    // 更新 bars 的宽度和间隙
-    updateBarsPositionAndSize();
-}, { passive: false });
-
-function updateBarsPositionAndSize() {
-    const newWidth = baseWidth * currentScale; // 计算新宽度
-    const newGap = baseGap * currentScale; // 计算新间隙
-
-    d3.select("#barcontainer").selectAll(".bar")
-        .style("width", newWidth + "px")
-        .style("left", function(d, i) {
-            return `${i * (newWidth + newGap)}px`;
-        });
-    updateCommunityOverlays(); // 更新社区方块的位置和宽度
+    body {
+    font-family: Arial, sans-serif;
+    color: #ffffff;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    font-family: Helvetica, sans-serif;
+    background-color: #000000;
+    position: relative; 
 }
-///////////////// 在窗口上监听鼠标滚轮事件
 
-
-
-
-////// 根据 community 对 bars 进行分组
-const communities = d3.group(data, d => d.community);
-
-communities.forEach((bars, communityName) => {
-const firstBar = bars[0];
-const lastBar = bars[bars.length - 1];
-
-// 计算 community 覆盖层的位置和宽度
-const communityPosition = parseFloat(d3.select(`.bar[data-id="${firstBar.id}"]`).style("left"));
-const lastBarPosition = parseFloat(d3.select(`.bar[data-id="${lastBar.id}"]`).style("left"));
-const communityWidth = (lastBarPosition - communityPosition) + (width * currentScale);
-
-// 在 barcontainer 中为这个 community 创建一个长方形覆盖层
-d3.select("#barcontainer").append("div")
-    .attr("class", "community")
-    .style("left", `${communityPosition}px`)
-    .style("width", `${communityWidth}px`)
-    .style("top", "0px") 
-    .style("height", "20px") 
-    .style("border", "2px solid white")
-    .text(communityName) 
-    .on("click", function() {
-        window.scrollTo({
-            top: document.querySelector(`.bar[data-id="${firstBar.id}"]`).offsetTop,
-            behavior: 'smooth'
-        });
-    });
-    });
-
-
-function updateCommunityOverlays() {
-    // 从全局变量获取 data
-    const communities = d3.group(data, d => d.community);
-    communities.forEach((bars, communityName) => {
-        const firstBar = bars[0];
-        const lastBar = bars[bars.length - 1];
-        
-        // 确保这里使用了更新后的 bar 位置和宽度
-        const firstBarDiv = d3.select(`.bar[data-id="${firstBar.id}"]`);
-        const lastBarDiv = d3.select(`.bar[data-id="${lastBar.id}"]`);
-
-        // 使用 parseFloat 确保从样式中获取的值被正确解析为数字
-        const firstBarLeft = parseFloat(firstBarDiv.style("left"));
-        const lastBarRight = parseFloat(lastBarDiv.style("left")) + parseFloat(lastBarDiv.style("width"));
-
-        const communityWidth = lastBarRight - firstBarLeft;
-
-        // 查找或创建社区方块
-        let communityDiv = d3.select(`.community[data-community="${communityName}"]`);
-        if (communityDiv.empty()) {
-            communityDiv = d3.select("#barcontainer").append("div")
-                .attr("class", "community")
-                .attr("data-community", communityName);
+        #backgroundimagesec {
+            margin: 0;
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background-image: url('/data/coverb.png'); 
+            background-size: cover; 
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: -1;
         }
 
-        communityDiv.style("left", `${firstBarLeft}px`)
-            .style("width", `${communityWidth}px`)
-            .text(communityName); 
-    });
+        section {
+            width: 1000px;
+            margin: 12px auto; 
+        }
+
+        #begin {
+            height: 100vh;
+            text-align: center;
+            margin: 0 auto; 
+
+            
+        }
+
+        header, section {
+            padding: 10px;
+        }
+
+        h1 {
+            font-size: 78px;
+            margin-bottom: 4px;
+            margin-top: 36%;
+        }
+
+        p {
+            font-size: 20px;
+        }
+
+        h2 {
+            font-size: 30px;
+            margin-bottom: 8px;
+            margin-top: 8px;
+        }
+
+        h3 {
+            font-size: 24px;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 20px 0;
+        }
+
+        #researchsite {
+            width: 700px; 
+            align-content: center;
+            margin: 0 auto; 
+        }
+
+        #researchsite {
+            width: 700px; 
+            align-content: center;
+            margin: 0 auto; 
+        }
+
+        #scroll {
+            width: 800px;
+            align-content: center;
+            margin: 0 auto; 
+        }
+
+
+        ul {
+            list-style: disc;
+            padding-left: 40px;
+            font-size: 18px;
+        }
+
+        figcaption {
+            margin: 10px;
+            font-size: 20px; 
+            color: #888;
+            text-align: center; 
+        }
+
+        #playButton {
+    display: block;
+    margin: 200px auto 200px auto; /* Centers the button horizontally and adds top & bottom margins */
+    padding: 15px 40px; /* Balanced padding for a readable button size */
+    font-size: 24px; /* Reasonable font size for readability */
+    color: white; /* Button text color */
+    background-color: transparent; /* Optional: Transparent background for a minimalistic style */
+    border: 2px solid #ffffff; /* Sets border width, style, and color */
+    border-radius: 12px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    font-weight: 500; /* Medium weight for button text */
+    letter-spacing: 2px; /* Adds spacing between letters */
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effects */
 }
 
 
+        #playButton:hover {
+            background-color: #515151;
+        }
 
+    </style>
+</head>
 
-    </script>
+<body>
+    <section id="backgroundimagesec">
+    </section>
+
+    <!-- <section id="begin">
+        <h1>The Sign of the City</h1>
+        <h2>——Decoding Urban Stories Through AI and Signage</h2>
+        <h3>Hongqian Li</h3>
+    </section> -->
+
+    <section id="background">
+        <h2>Background</h2>
+        <h3>The development of urban visual information study</h3>
+        <img src="/data/development.png" alt="The development of urban visual information study">
+        <figcaption>The development of urban visual information study</figcaption>
+        <p>
+            The tradition of incorporating visual information runs through the entire history of modern urban studies. 
+            In the late 1900s, Camilo Sitte and Ebenezer Howard started to study the sensory experience of citizens, 
+            emphasizing the shape and proportion of beauty in the public space. In the 1970s, Kevin Lynch started to 
+            study structure and human perceptions in the city. As they lay the foundation of many urban visual information 
+            studies, most of these are more focused on the physical aspects like shape, proportion, and human perceptions 
+            but do not much extend beyond these traditional dimensions to explore other aspects such as cultural, economic, 
+            and political aspects. With the development of AI, which could potentially open new opportunities in urban visual 
+            study, how can we utilize it to build up on the previous studies?
+        </p>
+    </section>
+
+    <section id="image-of-the-city">
+        <h3>Adding more to the Image of the City?</h3>
+        <img src="/data/imageofcity.gif" alt="Adding more to the Image of the City">
+        <figcaption>Adding more to the Image of the City</figcaption>
+        <p>
+            In the book <i>The Image of the City</i> by Kevin Lynch, he stated that a well-designed city incorporating 5 elements 
+            - paths, edges, districts, nodes, and landmarks - would obviate the need for additional signages, as the urban 
+            structure itself would inherently guide and inform. As long as people need signage, the image of the city fails...
+        </p>
+        <p>
+            However in modern cities, are there any cities with no signs? As one of the few elements in urban street views 
+            containing words and texts, signs offer a unique opportunity to glean insights beyond physical attributes, extending 
+            into more cultural, commercial, and political aspects. Therefore, this thesis seeks to explore a new way of urban visual 
+            information study, by taking what previous research overlooked and what Kevin Lynch considers a "failure" - signage - 
+            as an advantage, and leveraging new AI technology, to add more to the images of the city.
+        </p>
+    </section>
+
+    <section id="research-questions">
+        <h2>Research Questions</h2>
+        <ul>
+            <li>What AI technologies can help extract more information from urban images?</li>
+            <li>What do signs tell us about the city?</li>
+            <li>
+                What types of information signs can add to our understanding of the city
+                (Cultural, Financial, Temporary, Informal, Lexicon...)?
+            </li>
+        </ul>
+    </section>
+
+    <section id="methodology">
+        <h2>Methodology</h2>
+        <img src="/data/methodology.gif" alt="Research methodology">
+        <figcaption>Research Methodology</figcaption>
+        <p>
+            The research methodology consists of two steps: first, web-scraping to gather Street View images from Google Maps of the 
+            designated research site; second, analyzing these images using Deep Learning algorithms to classify the signs. After 
+            classification, the sign areas are extracted for further analysis. Optical Character Recognition (OCR) algorithms are then 
+            employed to decipher the content and language displayed in the signs.
+        </p>
+    </section>
+
+    <section id="studyfield">
+        <h2>Research Site</h2>
+        <img id="researchsite" src="/data/researchsite.png" alt="Research site">
+        <figcaption>Research Site</figcaption>
+        <p>
+            For the research, New York City was chosen as the primary site due to its rich diversity and urban complexity. To ensure 
+            representative sampling, the project identified central points within each borough as starting locations. Using a Python 
+            script to calculate the shortest path, a route was generated that traverses 46 New York Neighborhood Tabulation Areas (NTAs),
+             capturing a wide range of socio-economic characteristics across the city.
+        </p>
+    </section>
+
+    <section id="findings">
+        <h2>Findings</h2>
+        <img src="/data/index.png" alt="Signs type & language in NYC">
+        <figcaption>Signs type & language in NYC</figcaption>
+        <p>
+            19 signage types were identified in New York City and can be grouped into three main categories. The first group is street signs, 
+            which include Don't Block signs, Do Not Enter signs, and All Traffic signs, etc. The second group consists of business-related 
+            signs, including Shop signs, For rent signs, Promotion signs, etc. The third category is public infrastructure signs, including 
+            Bus stop signs, Scaffolding signs, Subway signs, etc. 7 signage languages were identified, including 6 non-English languages: 
+            Spanish, Chinese, French, Italian, Korean, and Russian.
+        </p>
+        <img id="scroll" src="/data/result-long.png" alt="A Scroll of NYC signs">
+        <figcaption>Data Visualization Overview</figcaption>
+        <p>
+            Signs tell us about different neighborhoods' financial, cultural, and lexical layers... In Midtown and Flushing, diverse shop 
+            signs point to vibrant local commercial hubs. Lease signs, particularly prominent in Midtown South, indicate ongoing rental 
+            activity. Sign language reflects the ethnic composition of each area, with Chinese signage prevalent in Flushing, Italian in 
+            Ocean Hill, and Spanish in Woodhaven, which notably also features a significant number of Korean signs. Sign content reveals 
+            varied local lexicons, with phrases like "best" commonly seen in Flatbush and Brownsville, and "lucky" prevalent in Chinatown...
+        </p>
+    </section>
+    <button id="playButton" onclick="location.href='application.html'">PLAY THE APPLICATION</button>
+
 </body>
 </html>
